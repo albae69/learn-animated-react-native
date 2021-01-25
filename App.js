@@ -12,6 +12,13 @@ export default function App() {
     delay: 2000,
   }).start();
 
+  const transition = new Animated.Value(0);
+  Animated.timing(transition, {
+    useNativeDriver: true,
+    toValue: 1,
+    delay: 1000,
+  }).start();
+
   return (
     <View style={{flex: 1, backgroundColor: 'white'}}>
       <Animated.View
@@ -22,6 +29,7 @@ export default function App() {
           backgroundColor: 'lightgray',
           justifyContent: 'center',
           alignItems: 'center',
+          opacity: transition,
         }}>
         <Text>Hello world!</Text>
       </Animated.View>
