@@ -10,6 +10,12 @@ export default function App() {
       position.setValue({x: gesture.dx, y: gesture.dy});
       // console.log(gesture);
     },
+    onPanResponderRelease: () => {
+      Animated.spring(position, {
+        useNativeDriver: true,
+        toValue: {x: 0, y: 0},
+      }).start();
+    },
   });
 
   const rotate = position.x.interpolate({
