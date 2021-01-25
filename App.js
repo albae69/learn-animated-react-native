@@ -1,16 +1,16 @@
 import React from 'react';
-import {View, Text, Animated} from 'react-native';
+import {View, Text, Animated, PanResponder} from 'react-native';
 
 export default function App() {
   const position = new Animated.ValueXY({x: 0, y: 0});
-  Animated.timing(position, {
-    useNativeDriver: true,
-    toValue: {
-      x: 150,
-      y: 250,
+
+  const panGesture = PanResponder.create({
+    onMoveShouldSetPanResponder: () => true,
+    onPanResponderMove: (e, gesture) => {
+      position.setValue({x: gesture.dx, y: gesture.dy});
+      // console.log(gesture);
     },
-    delay: 1000,
-  }).start();
+  });
 
   const rotate = position.x.interpolate({
     inputRange: [0, 50],
@@ -18,8 +18,15 @@ export default function App() {
   });
 
   return (
-    <View style={{flex: 1, backgroundColor: 'white'}}>
+    <View
+      style={{
+        flex: 1,
+        backgroundColor: 'white',
+        justifyContent: 'center',
+        alignItems: 'center',
+      }}>
       <Animated.View
+        {...panGesture.panHandlers}
         style={{
           transform: [
             {translateX: position.x},
