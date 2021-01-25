@@ -1,52 +1,101 @@
 import React from 'react';
-import {View, Text, Animated, PanResponder} from 'react-native';
+import {View, Text, Animated, Dimensions, ScrollView} from 'react-native';
+
+const HEADER_HEIGHT = 50;
+
+const Header = () => {
+  return (
+    <View
+      style={{
+        height: HEADER_HEIGHT,
+        backgroundColor: 'red',
+        justifyContent: 'center',
+        padding: 20,
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        right: 0,
+      }}>
+      <Text style={{fontWeight: 'bold', fontSize: 20, color: 'white'}}>
+        Header
+      </Text>
+    </View>
+  );
+};
+
+const arr = [
+  {
+    id: 0,
+    name: 'Hello',
+  },
+  {
+    id: 1,
+    name: 'World',
+  },
+  {
+    id: 2,
+    name: 'My ',
+  },
+  {
+    id: 3,
+    name: 'Name',
+  },
+  {
+    id: 4,
+    name: 'Is',
+  },
+];
+
+const List = () => {
+  const {width} = Dimensions.get('window');
+  return arr.map((item) => (
+    <View
+      key={item.id}
+      style={{
+        marginBottom: 10,
+        marginTop: 10,
+        height: 150,
+        width: width - 50,
+        padding: 20,
+        backgroundColor: 'white',
+        borderRadius: 8,
+        elevation: 8,
+      }}>
+      <Text>{item.name}</Text>
+    </View>
+  ));
+};
 
 export default function App() {
-  const position = new Animated.ValueXY({x: 0, y: 0});
-
-  const panGesture = PanResponder.create({
-    onMoveShouldSetPanResponder: () => true,
-    onPanResponderMove: (e, gesture) => {
-      position.setValue({x: gesture.dx, y: gesture.dy});
-      // console.log(gesture);
-    },
-    onPanResponderRelease: () => {
-      Animated.spring(position, {
-        useNativeDriver: true,
-        toValue: {x: 0, y: 0},
-      }).start();
-    },
+  const scrollY = new Animated.Value(0);
+  const diffClamp = new Animated.diffClamp(scrollY, 0, HEADER_HEIGHT);
+  const translateY = diffClamp.interpolate({
+    inputRange: [0, HEADER_HEIGHT],
+    outputRange: [0, -HEADER_HEIGHT],
   });
-
-  const rotate = position.x.interpolate({
-    inputRange: [0, 50],
-    outputRange: ['0deg', '360deg'],
-  });
-
   return (
     <View
       style={{
         flex: 1,
         backgroundColor: 'white',
-        justifyContent: 'center',
-        alignItems: 'center',
       }}>
       <Animated.View
-        {...panGesture.panHandlers}
-        style={{
-          transform: [
-            {translateX: position.x},
-            {translateY: position.y},
-            {rotate: rotate},
-          ],
-          height: 80,
-          width: 80,
-          backgroundColor: 'lightgray',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}>
-        <Text>Hello world!</Text>
+        style={{transform: [{translateY: translateY}], elevation: 4}}>
+        <Header />
       </Animated.View>
+      <ScrollView
+        onScroll={(e) => {
+          scrollY.setValue(e.nativeEvent.contentOffset.y);
+        }}>
+        <View
+          style={{
+            justifyContent: 'center',
+            alignItems: 'center',
+            paddingTop: 50,
+          }}>
+          <List />
+        </View>
+      </ScrollView>
     </View>
   );
 }
